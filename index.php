@@ -1,77 +1,87 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <style>
-        body {
-            width: 50%;
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.js"></script>
+    <style type="text/css">
+        .wrapper{
+            width: 650px;
             margin: 0 auto;
-            padding: 50px;
         }
-
-        input[type=text],
-        select {
-            width: 100%;
-            padding: 12px 20px;
-            margin: 8px 0;
-            display: inline-block;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
+        .page-header h2{
+            margin-top: 0;
         }
-
-        input[type=submit] {
-            width: 100%;
-            background-color: #4CAF50;
-            color: white;
-            padding: 14px 20px;
-            margin: 8px 0;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-
-        input[type=submit]:hover {
-            background-color: #45a049;
-        }
-
-        div {
-            border-radius: 5px;
-            background-color: #f2f2f2;
-            padding: 20px;
+        table tr td:last-child a{
+            margin-right: 15px;
         }
     </style>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            $('[data-toggle="tooltip"]').tooltip();   
+        });
+    </script>
 </head>
-
 <body>
-
-    <form action="" method="POST">
-        <label for="numbera">Nhập a:</label>
-        <input type="text" id="numbera" name="numbera" value="">
-        <label for="numberb">Nhap b:</label>
-        <input type="text" id="numberb" name="numberb" value="">
-        <label for="ketqua">Kết quả:</label>
-        <input type="text" id="ketqua" name="ketqua" disabled 
-        value="<?php
-            if (isset($_POST["numbera"]) && isset($_POST["numberb"])){
-                $a = $_POST["numbera"];
-                $b = $_POST["numberb"];
-                if ($a == 0) {
-                    echo "Số a phải khác 0";
-                } else if ($b == 0) {
-                    echo "Phương trình có vô số nghiệm";
-                } else {
-                echo -$b / $a;
-                }
-            }
-        ?>">
-        <input type="submit" value="Thực hiện">
-    </form>
-    
+    <div class="wrapper">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="page-header clearfix">
+                        <h2 class="pull-left">Employees Details</h2>
+                        <a href="create.php" class="btn btn-success pull-right">Add New Employee</a>
+                    </div>
+                    <?php
+                    // Include file config.php
+                    require_once "config.php";
+                    
+                    // Cố gắng thực thi truy vấn
+                    $sql = "SELECT * FROM employees";
+                    if($result = $pdo->query($sql)){
+                        if($result->rowCount() > 0){
+                            echo "<table class='table table-bordered table-striped'>";
+                                echo "<thead>";
+                                    echo "<tr>";
+                                        echo "<th>#</th>";
+                                        echo "<th>Name</th>";
+                                        echo "<th>Address</th>";
+                                        echo "<th>Salary</th>";
+                                        echo "<th>Action</th>";
+                                    echo "</tr>";
+                                echo "</thead>";
+                                echo "<tbody>";
+                                while($row = $result->fetch()){
+                                    echo "<tr>";
+                                        echo "<td>" . $row['id'] . "</td>";
+                                        echo "<td>" . $row['name'] . "</td>";
+                                        echo "<td>" . $row['address'] . "</td>";
+                                        echo "<td>" . $row['salary'] . "</td>";
+                                        echo "<td>";
+                                            echo "<a href='read.php?id=". $row['id'] ."' title='View Record' data-toggle='tooltip'><span class='glyphicon glyphicon-eye-open'></span></a>";
+                                            echo "<a href='update.php?id=". $row['id'] ."' title='Update Record' data-toggle='tooltip'><span class='glyphicon glyphicon-pencil'></span></a>";
+                                            echo "<a href='delete.php?id=". $row['id'] ."' title='Delete Record' data-toggle='tooltip'><span class='glyphicon glyphicon-trash'></span></a>";
+                                        echo "</td>";
+                                    echo "</tr>";
+                                }
+                                echo "</tbody>";                            
+                            echo "</table>";
+                            // Free result set
+                            unset($result);
+                        } else{
+                            echo "<p class='lead'><em>Không tìm thấy bản ghi.</em></p>";
+                        }
+                    } else{
+                        echo "ERROR: Không thể thực thi $sql. " . $mysqli->error;
+                    }
+                    
+                    // Đóng kết nối
+                    unset($pdo);
+                    ?>
+                </div>
+            </div>        
+        </div>
+    </div>
 </body>
-
 </html>
